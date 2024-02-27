@@ -1,4 +1,4 @@
-package project
+package generator
 
 import (
 	_ "embed"
@@ -7,7 +7,7 @@ import (
 
 const (
 	DefaultGoVersion      = "1.22.0"
-	golangImageRepository = "jaredp37/cacidy-go-runner"
+	golangImageRepository = "cacidy/go-runner"
 )
 
 var (
@@ -23,10 +23,7 @@ var (
 	dockerfile string
 )
 
-func NewGolangProject(path string, args NewProjectArgs) error {
-	if err := initializeProject(path); err != nil {
-		return err
-	}
+func NewGolangProject(path string, args GenerateArgs) error {
 	r := newRenderer(path, args)
 	r.addTemplate(filepath.Join("common", "go.mod"), commonGoMod, nil)
 	r.addTemplate(filepath.Join("common", "common.go"), commonMain, nil)

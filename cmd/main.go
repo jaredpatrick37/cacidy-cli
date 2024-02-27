@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/urfave/cli/v3"
@@ -17,6 +17,6 @@ var rootCmd = &cli.Command{
 
 func main() {
 	if err := rootCmd.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Printf("%s %s\n", errorStyle.Render("[ERR]"), err)
 	}
 }

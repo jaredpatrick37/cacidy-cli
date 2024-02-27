@@ -1,35 +1,13 @@
-package project
+package generator
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
 
 	"github.com/mitchellh/mapstructure"
 )
-
-const (
-	GoSDK     = "go"
-	NodeSDK   = "node"
-	PythonSDK = "python"
-)
-
-var SDKS = []string{GoSDK, NodeSDK, PythonSDK}
-
-type NewProjectArgs struct {
-	GoVersion string
-}
-
-func New(path, sdk string, args NewProjectArgs) error {
-	switch sdk {
-	case GoSDK:
-		return NewGolangProject(path, args)
-	}
-	return nil
-}
 
 type rendererTemplate struct {
 	dest string
@@ -39,7 +17,7 @@ type rendererTemplate struct {
 
 type renderer struct {
 	path      string
-	args      NewProjectArgs
+	args      GenerateArgs
 	templates []rendererTemplate
 }
 
@@ -57,7 +35,6 @@ func (r *renderer) render() error {
 		if err := t.Execute(&text, tmpl.args); err != nil {
 			return err
 		}
-		fmt.Printf("%+v\n", tmpl.args)
 		if err := os.WriteFile(filepath.Join(r.path, tmpl.dest), text.Bytes(), 0644); err != nil {
 			return err
 		}
@@ -65,18 +42,6 @@ func (r *renderer) render() error {
 	return nil
 }
 
-func newRenderer(path string, args NewProjectArgs) *renderer {
+func newRenderer(path string, args GenerateArgs) *renderer {
 	return &renderer{path: path, args: args}
-}
-
-func initializeProject(path string) error {
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return errors.New("the provided path already exists")
-	}
-	for _, dir := range []string{"bin", "common", "pipelines/hello"} {
-		if err := os.MkdirAll(filepath.Join(path, dir), 0755); err != nil {
-			return err
-		}
-	}
-	return nil
 }
