@@ -1,0 +1,31 @@
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"cacidy.io/common"
+	"dagger.io/dagger"
+)
+
+func main() {
+	client, err := dagger.Connect(context.Background(), dagger.WithLogOutput(os.Stderr))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+	if err := hello(client); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func hello(client *dagger.Client) error {
+	container := client.Container().From("alpine").WithDirectory("/src", common.Source(client))
+	container = container.WithWorkdir("/src")
+	container = container.WithExec([]string{"echo", "Hello, World!"})
+	if _, err := container.Sync(context.Background()); err != nil {
+		return err
+	}
+	return nil
+}

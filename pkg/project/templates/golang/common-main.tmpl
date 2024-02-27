@@ -1,0 +1,16 @@
+package common
+
+import (
+	"os"
+
+	"dagger.io/dagger"
+)
+
+// Source returns the source code directory
+func Source(client *dagger.Client) *dagger.Directory {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return client.Host().Directory(cwd)
+}
